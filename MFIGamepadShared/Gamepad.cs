@@ -47,10 +47,31 @@ namespace MFIGamepadFeeder
                 Log($@"Failed to acquire vJoy device number {_gamepadId}.\n");
                 return;
             }
-
-            ResetGamepad(_gamepadId);
         }
 
+        /** plug Xbox feeder device*/
+        public Boolean plug()
+        {
+            // XboxInterface plugin
+            if (!_vBox.PlugIn(_gamepadId))
+            {
+                Log($@"Failed to plugIn vJoy device number {_gamepadId}.\n");
+                return false;
+            }
+            // reset State
+            ResetGamepad(_gamepadId);
+            return true;
+        }
+
+        /**unplug Xbox feeder device
+         Called by the application when exiting */
+        public Boolean unPlug(Boolean force)
+        {
+            if (force)
+                return _vBox.UnPlugForce(_gamepadId);
+            else
+                return _vBox.UnPlug(_gamepadId);
+        }
         public event ErorOccuredEventHandler ErrorOccuredEvent;
 
         private void Log(string message)
@@ -67,7 +88,6 @@ namespace MFIGamepadFeeder
             {
                 zeroState[i] = 0;
             }
-
             UpdateState(zeroState);
         }
 
