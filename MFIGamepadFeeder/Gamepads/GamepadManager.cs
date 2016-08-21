@@ -59,11 +59,12 @@ namespace MFIGamepadFeeder.Gamepads
 
         public void Refresh()
         {
+            // Kill exisiting gamepad Thread
             _currentGamepadThread?.Abort();
             _currentGamepadThread = new Thread(async () =>
             {
                 Thread.CurrentThread.IsBackground = true;
-
+                // Read User input settings
                 var selectedConfigFile = Settings.Default.SelectedConfigFile;
                 var selectedHidDevice = Settings.Default.SelectedHidDevice;
                 var vJoyId = Settings.Default.SelectedJoyId;
@@ -77,7 +78,7 @@ namespace MFIGamepadFeeder.Gamepads
 
                 GamepadConfiguration configuration = null;
                 HidDeviceRepresentation hidDeviceRepresentation = null;
-
+                // Load ConfigCreator configuration file or return exception
                 try
                 {
                     configuration = await GetConfigFromFilePath(selectedConfigFile);
@@ -87,18 +88,21 @@ namespace MFIGamepadFeeder.Gamepads
                 catch (Exception ex)
                 {
                     Log($"Error while reading configuration: {ex.Message}");
+                    return;
                 }
 
                 Log($"Using {hidDeviceRepresentation}, vJoy {vJoyId}, configuration file: {selectedConfigFile}");
-
+                // Setup device communication
                 SetupGamepad(hidDeviceRepresentation, vJoyId, configuration);
             });
             _currentGamepadThread.Start();
         }
 
+        /** Open HID stream for user input read and output to Gamepad virtual device (vJoy)*/
         public void SetupGamepad(HidDeviceRepresentation hidDeviceRepresentation, uint gamePadId,
             GamepadConfiguration config)
         {
+            Gamepad gamepad = null;
             try
             {
                 var device =
@@ -110,54 +114,67 @@ namespace MFIGamepadFeeder.Gamepads
                         ).First();
 
 
-            if (device == null)
-            {
-                Log(@"Failed to open device.");
-                return;
-            }
-
-            HidStream stream;
-            if (!device.TryOpen(out stream))
-            {
-                Log("Failed to open device.");
-                return;
-            }
-
-            var gamepad = new Gamepad(config, gamePadId);
-            gamepad.ErrorOccuredEvent += Gamepad_ErrorOccuredEvent;
-
-            Log("Successfully initialized gamepad");
-
-            using (stream)
-            {
-                while (true)
+                if (device == null)
                 {
-                    var bytes = new byte[device.MaxInputReportLength];
-                    int count;
-                    try
+                    Log(@"Failed to open device.");
+                    return;
+                }
+
+                HidStream stream;
+                if (!device.TryOpen(out stream))
+                {
+                    Log("Failed to open device.");
+                    return;
+                }
+
+                gamepad = new Gamepad(config, gamePadId);
+                gamepad.ErrorOccuredEvent += Gamepad_ErrorOccuredEvent;
+
+                Log("Successfully initialized gamepad.");
+                if (!gamepad.plug())
+                {
+                    // try to unplug forced
+                    if (gamepad.unPlug(true))
+                        Log("Gamepad unplugged.");
+                    return;
+                }
+                Log("Gamepad plugged in...");
+
+                using (stream)
+                {
+                    while (true)
                     {
-                        count = stream.Read(bytes, 0, bytes.Length);
-                    }
-                    catch (TimeoutException)
-                    {
-                        continue;
-                    }
+                        var bytes = new byte[device.MaxInputReportLength];
+                        int count;
+                        try
+                        {
+                            count = stream.Read(bytes, 0, bytes.Length);
+
+                            if (count > 0)
+                            {
+                                gamepad.UpdateState(bytes);
+                            }
+                        }
+                        catch (TimeoutException)
+                        {
+                            continue;
+                        }
                         catch (Exception ex)
                         {
                             Log(ex.Message);
                             break;
                         }
-
-                    if (count > 0)
-                    {
-                        gamepad.UpdateState(bytes);
                     }
                 }
-            }
             }
             catch (Exception ex)
             {
                 Log(ex.Message);
+            }
+            finally
+            {
+                if (gamepad.unPlug(false))
+                    Log("Gamepad unplugged.");
             }
         }
 
@@ -172,7 +189,7 @@ namespace MFIGamepadFeeder.Gamepads
 
         private void Gamepad_ErrorOccuredEvent(object sender, string errorMessage)
         {
-            Log(errorMessage);
+            Log(sender?.ToString() + " : " + errorMessage);
         }
 
         protected virtual void Log(string errormessage)
@@ -184,6 +201,7 @@ namespace MFIGamepadFeeder.Gamepads
         {
             _currentDeviceUpdateThread.Abort();
             _currentGamepadThread.Abort();
+
         }
     }
 }
