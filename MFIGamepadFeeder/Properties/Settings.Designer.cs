@@ -25,8 +25,6 @@ namespace MFIGamepadFeeder.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("(Vendor ID: 65535, Product ID: 0, Product version: 0, Serial Number: 289a4b181e8f" +
-            ")")]
         public string SelectedHidDevice {
             get {
                 return ((string)(this["SelectedHidDevice"]));
@@ -38,7 +36,6 @@ namespace MFIGamepadFeeder.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public uint SelectedJoyId {
             get {
                 return ((uint)(this["SelectedJoyId"]));
@@ -50,13 +47,48 @@ namespace MFIGamepadFeeder.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Configs/Nimbus.mficonfiguration")]
         public string SelectedConfigFile {
             get {
                 return ((string)(this["SelectedConfigFile"]));
             }
             set {
                 this["SelectedConfigFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SelectedHidDevice2 {
+            get {
+                return ((string)(this["SelectedHidDevice2"]));
+            }
+            set {
+                this["SelectedHidDevice2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public uint SelectedJoyId2 {
+            get {
+                return ((uint)(this["SelectedJoyId2"]));
+            }
+            set {
+                this["SelectedJoyId2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Configs/Nimbus.mficonfiguration")]
+        public string SelectedConfigFile2 {
+            get {
+                return ((string)(this["SelectedConfigFile2"]));
+            }
+            set {
+                this["SelectedConfigFile2"] = value;
             }
         }
     }

@@ -84,7 +84,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="VboxWrap, Version=1.0.6088.36909, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="VboxWrap, Version=1.0.6090.30449, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\vJoy\x64\Release-Xbox\VboxWrap.dll</HintPath>
     </Reference>

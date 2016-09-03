@@ -3,12 +3,21 @@
   <Profiles />
   <Settings>
     <Setting Name="SelectedHidDevice" Type="System.String" Scope="User">
-      <Value Profile="(Default)">(Vendor ID: 65535, Product ID: 0, Product version: 0, Serial Number: 289a4b181e8f)</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="SelectedJoyId" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="SelectedConfigFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Configs/Nimbus.mficonfiguration</Value>
+    </Setting>
+    <Setting Name="SelectedHidDevice2" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="SelectedJoyId2" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="SelectedConfigFile2" Type="System.String" Scope="User">
       <Value Profile="(Default)">Configs/Nimbus.mficonfiguration</Value>
     </Setting>
   </Settings>
