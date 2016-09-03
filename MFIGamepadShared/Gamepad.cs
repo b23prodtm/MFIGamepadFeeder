@@ -16,6 +16,9 @@ namespace MFIGamepadFeeder
         private readonly uint _gamepadId;
         private readonly IWrapper _vBox;
 
+        /**
+         * Gamepad IWrapper is created if the VBus exists on the host.
+         * **/
         public Gamepad(GamepadConfiguration config, uint gamepadId)
         {
             _config = config;
@@ -91,127 +94,150 @@ namespace MFIGamepadFeeder
             UpdateState(zeroState);
         }
 
-        public void UpdateState(byte[] state)
-        {            
-//            Log(string.Join(" ", state));
-
+        public unsafe void UpdateState(byte[] state)
+        {
+            //            Log(string.Join(" ", state));
+            uint dPad = 0;
+            byte AxisX = 0, AxisY = 0, AxisRX = 0, AxisRY = 0, AxisSL0 = 0, AxisSL1 = 0;
             for (var i = 0; i < _config.ConfigItems.Count; i++)
             {
-                SetGamepadItem(state, i, _config.ConfigItems[i]);
+                GetAxis(state, i, &AxisX, &AxisY, &AxisRX, &AxisRY, &AxisSL0, &AxisSL1);
+                SetGamepadItem(state, i);
+                GetDpad(state, i, &dPad);
             }
-
-            SetDPad(state, _config.ConfigItems);
+            _vBox.SetAxisXY(_gamepadId, &AxisX, &AxisY, hid_X, hid_Y, xinput_LAXIS_DEADZONE);
+            _vBox.SetAxisRxy(_gamepadId, &AxisRX, &AxisRY, xinput_RAXIS_DEADZONE);
+            _vBox.SetTriggerL(_gamepadId, AxisSL0, xinput_TRIGGER_THRESHOLD);
+            _vBox.SetTriggerR(_gamepadId, AxisSL1, xinput_TRIGGER_THRESHOLD);
+            _vBox.SetDpad(_gamepadId, dPad);
         }
 
-        private unsafe void SetGamepadItem(byte[] values, int index, GamepadConfigurationItem config)
+        /**
+         A normalized axis value is sent to vJoy Driver.
+            */
+        private unsafe void GetAxis(byte[] values, int index, byte* AxisX, byte* AxisY,
+            byte* AxisRX, byte* AxisRY, byte* AxisSL0, byte* AxisSL1)
         {
             double value = values[index];
+            GamepadConfigurationItem config = _config.ConfigItems[index];
             if (config.Type == GamepadItemType.Axis)
             {
                 int maxAxisValue = 0;
-                var targetAxis = config.TargetUsage ?? _vBox.hid_X;
+                uint targetAxis = config.TargetUsage ?? 0;
+                if (targetAxis == 0) return;
+                /** get max value for the axis (trigger/Slider is 255 and left/right 
+             * analog sticks +-32767 **/
                 _vBox.GetVJDAxisMax(_gamepadId, targetAxis, &maxAxisValue);
-                value = NormalizeAxis((byte) value, config.ConvertAxis ?? false);
+                /** MFI controller returns [0;Byte.MaxValue] axes, normalize [0;1]*/
+                value = NormalizeAxis((byte)value, config.ConvertAxis ?? false);
 
                 if (config.InvertAxis ?? false)
                 {
                     value = InvertNormalizedAxis(value);
                 }
-
-                _vBox.SetAxis((int) (value*maxAxisValue), _gamepadId, targetAxis);
-            }
-            else if (config.Type == GamepadItemType.Button)
-            {
-                _vBox.SetBtn(ConvertToButtonState((byte) value), _gamepadId, (byte)(config.TargetButtonId ?? 0));
+                /** define byte value with maximum Axis value from xInput*/
+                byte bvalue = (byte)(uint)(value * maxAxisValue);
+                if (targetAxis == hid_X)
+                {
+                    *AxisX = bvalue;
+                }
+                else if (targetAxis == hid_Y)
+                {
+                    *AxisY = bvalue;
+                }
+                else if (targetAxis == hid_RX)
+                {
+                    *AxisRX = bvalue;
+                }
+                else if (targetAxis == hid_RY)
+                {
+                    *AxisRY = bvalue;
+                }
+                else if (targetAxis == hid_SL0)
+                {
+                    *AxisSL0 = bvalue;
+                    /** The MFi controller doesn't provide a left Thumb button 
+                     * and the slider/trigger is not recognized as one,
+                     * so we can simulate and add a btn press (as the Left Thumb)*/
+                    _vBox.SetBtnLT(_gamepadId, ConvertToButtonState(bvalue));
+                }
+                else if (targetAxis == hid_SL1)
+                {
+                    *AxisSL1 = bvalue;
+                    /** The MFi controller doesn't provide a rightThumb button 
+                     * and the slider/trigger is not recognized as one,
+                     * so we can simulate and add a btn press (as the Right Thumb)*/
+                    _vBox.SetBtnRT(_gamepadId, ConvertToButtonState(bvalue));
+                }
             }
         }
-
-        private void SetDPad(byte[] values, Collection<GamepadConfigurationItem> config)
+        private unsafe void SetGamepadItem(byte[] values, int index)
         {
-            var dPadUp = false;
-            var dPadRight = false;
-            var dPadDown = false;
-            var dPadLeft = false;
-
-            for (var i = 0; i < config.Count; i++)
+            double value = values[index];
+            GamepadConfigurationItem config = _config.ConfigItems[index];
+            if (config.Type == GamepadItemType.Button)
             {
-                if (config[i].Type == GamepadItemType.DPadUp)
+                _vBox.SetBtnAny(_gamepadId, ConvertToButtonState((byte)value), config.TargetButtonId ?? 0);
+            }
+        }
+        /** dPad flags*/
+        /** concatenate dPad values */
+        private unsafe void GetDpad(byte[] state, int index, uint* dPad)
+        {
+            bool buttonState = ConvertToButtonState((byte)state[index]);
+            if (buttonState)
+            {
+                GamepadConfigurationItem config = _config.ConfigItems[index];
+                if (config.Type == GamepadItemType.DPadUp)
                 {
-                    dPadUp = ConvertToButtonState(values[i]);
+                    *dPad |= xinput_DPAD_UP;
                 }
 
-                if (config[i].Type == GamepadItemType.DPadRight)
+                if (config.Type == GamepadItemType.DPadRight)
                 {
-                    dPadRight = ConvertToButtonState(values[i]);
+                    *dPad |= xinput_DPAD_RIGHT;
                 }
 
-                if (config[i].Type == GamepadItemType.DPadDown)
+                if (config.Type == GamepadItemType.DPadDown)
                 {
-                    dPadDown = ConvertToButtonState(values[i]);
+                    *dPad |= xinput_DPAD_DOWN;
                 }
 
-                if (config[i].Type == GamepadItemType.DPadLeft)
+                if (config.Type == GamepadItemType.DPadLeft)
                 {
-                    dPadLeft = ConvertToButtonState(values[i]);
+                    *dPad |= xinput_DPAD_LEFT;
                 }
             }
-
-
-            if (dPadUp && dPadRight)
-            {
-                _vBox.SetDpadUpRight(_gamepadId);
-            }
-            else if (dPadRight && dPadDown)
-            {
-                _vBox.SetDpadDownRight(_gamepadId);
-            }
-            else if (dPadDown && dPadLeft)
-            {
-                _vBox.SetDpadDownLeft(_gamepadId);
-            }
-            else if (dPadLeft && dPadUp)
-            {
-                _vBox.SetDpadUpLeft(_gamepadId);
-            }
-            else if (dPadUp)
-            {
-                _vBox.SetDpadUp(_gamepadId);
-            }
-            else if (dPadRight)
-            {
-                _vBox.SetDpadRight(_gamepadId);
-            }
-            else if (dPadDown)
-            {
-                _vBox.SetDpadDown(_gamepadId);
-            }
-            else if (dPadLeft)
-            {
-                _vBox.SetDpadLeft(_gamepadId);
-            }
-            _vBox.SetDpadOff(_gamepadId);
         }
 
-
+        /**
+         * param name="valueToNormalize" unsigned 8-bit integer sent by the MFI controller
+         * param param name="shouldConvert" rotates axis by 180°. byte.MaxValue/2.0 is the center
+         * returns is a double between [0 ; 1.0]
+         **/
         private double NormalizeAxis(byte valueToNormalize, bool shouldConvert)
         {
             if (shouldConvert)
             {
-                if (valueToNormalize < byte.MaxValue/2.0)
+                if (valueToNormalize < byte.MaxValue / 2.0)
                 {
-                    return (valueToNormalize + byte.MaxValue/2.0)/byte.MaxValue;
+                    return (valueToNormalize + byte.MaxValue / 2.0) / byte.MaxValue;
                 }
-                return (valueToNormalize - byte.MaxValue/2.0)/byte.MaxValue;
+                return (valueToNormalize - byte.MaxValue / 2.0) / byte.MaxValue;
             }
 
-            return (double) valueToNormalize/byte.MaxValue;
+            return (double)valueToNormalize / byte.MaxValue;
         }
 
+        /** invert +/- axis value **/
         private double InvertNormalizedAxis(double axisToInvert)
         {
             return 1.0 - axisToInvert;
         }
 
+        /** 
+         * returns true if > 0
+         * **/
         private bool ConvertToButtonState(byte value)
         {
             return value > 0;

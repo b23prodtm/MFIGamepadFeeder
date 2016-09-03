@@ -21,22 +21,23 @@ namespace MFIGamepadFeeder
 
         private GamepadManager CurrentGamepadManager { get; }
 
-        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        private void Refresh()
         {
-            WindowState = WindowState.Minimized;
-
             HidDeviceCombobox.ItemsSource = CurrentGamepadManager.FoundDevices;
             HidDeviceCombobox.SelectedItem = CurrentGamepadManager.SelectedDevice;
 
             DeviceIdTextBox.Text = Settings.Default.SelectedJoyId.ToString();
-
-            var configFiles =
-                Directory.GetFiles("Configs", "*.*", SearchOption.AllDirectories)
-                    .Where(s => s.EndsWith(".mficonfiguration"));
+            var configFiles = Directory.GetFiles("Configs", "*.*", SearchOption.AllDirectories)
+         .Where(s => s.EndsWith(".mficonfiguration"));
             ConfigFileCombobox.ItemsSource = configFiles;
-            ConfigFileCombobox.SelectedItem = Settings.Default.SelectedConfigFile;
-
+            ConfigFileCombobox.SelectedItem = Settings.Default.SelectedConfigFile.ToString();
             CurrentGamepadManager.Refresh();
+        }
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+            Refresh();
         }
 
         private void CurrentGamepadManager_ErrorOccuredEvent(object sender, string errorMessage)
@@ -60,7 +61,7 @@ namespace MFIGamepadFeeder
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            CurrentGamepadManager.Refresh();
+            Refresh();
         }
 
         private void DeviceIdTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -94,7 +95,7 @@ namespace MFIGamepadFeeder
         }
 
         private void NotifyIcon_TrayLeftMouseDown(object sender, RoutedEventArgs e)
-        {            
+        {
             WindowState = WindowState.Normal;
             Show();
             Activate();
@@ -106,7 +107,6 @@ namespace MFIGamepadFeeder
             if (WindowState.Minimized == WindowState)
             {
                 NotifyIcon.Visibility = Visibility.Visible;
-                Hide();
             }
             else if (WindowState.Normal == WindowState)
             {

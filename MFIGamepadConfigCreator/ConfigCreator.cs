@@ -57,7 +57,7 @@ namespace MFIGamepadConfigCreator
                     TargetUsage = null,
                     InvertAxis = null,
                     ConvertAxis = null,
-                    TargetButtonId = 1,
+                    TargetButtonId = vXbox.IWrapper.xinput_GAMEPAD_A,
                     Type = GamepadItemType.Button
                 },
                 new GamepadConfigurationItem
@@ -65,7 +65,7 @@ namespace MFIGamepadConfigCreator
                     TargetUsage = null,
                     InvertAxis = null,
                     ConvertAxis = null,
-                    TargetButtonId = 2,
+                    TargetButtonId = vXbox.IWrapper.xinput_GAMEPAD_B,
                     Type = GamepadItemType.Button
                 },
                 new GamepadConfigurationItem
@@ -73,7 +73,7 @@ namespace MFIGamepadConfigCreator
                     TargetUsage = null,
                     InvertAxis = null,
                     ConvertAxis = null,
-                    TargetButtonId = 3,
+                    TargetButtonId = vXbox.IWrapper.xinput_GAMEPAD_X,
                     Type = GamepadItemType.Button
                 },
                 new GamepadConfigurationItem
@@ -81,7 +81,7 @@ namespace MFIGamepadConfigCreator
                     TargetUsage = null,
                     InvertAxis = null,
                     ConvertAxis = null,
-                    TargetButtonId = 4,
+                    TargetButtonId = vXbox.IWrapper.xinput_GAMEPAD_Y,
                     Type = GamepadItemType.Button
                 },
                 new GamepadConfigurationItem
@@ -89,7 +89,7 @@ namespace MFIGamepadConfigCreator
                     TargetUsage = null,
                     InvertAxis = null,
                     ConvertAxis = null,
-                    TargetButtonId = 5,
+                    TargetButtonId = vXbox.IWrapper.xinput_GAMEPAD_LEFT_SHOULDER,
                     Type = GamepadItemType.Button
                 },
                 new GamepadConfigurationItem
@@ -97,12 +97,12 @@ namespace MFIGamepadConfigCreator
                     TargetUsage = null,
                     InvertAxis = null,
                     ConvertAxis = null,
-                    TargetButtonId = 6,
+                    TargetButtonId = vXbox.IWrapper.xinput_GAMEPAD_RIGHT_SHOULDER,
                     Type = GamepadItemType.Button
                 },
                 new GamepadConfigurationItem
                 {
-                    TargetUsage = _vBox.hid_SL0,
+                    TargetUsage = vXbox.IWrapper.hid_SL0,
                     InvertAxis = false,
                     ConvertAxis = false,
                     TargetButtonId = null,
@@ -110,7 +110,7 @@ namespace MFIGamepadConfigCreator
                 },
                 new GamepadConfigurationItem
                 {
-                    TargetUsage = _vBox.hid_SL1,
+                    TargetUsage = vXbox.IWrapper.hid_SL1,
                     InvertAxis = false,
                     ConvertAxis = false,
                     TargetButtonId = null,
@@ -121,12 +121,12 @@ namespace MFIGamepadConfigCreator
                     TargetUsage = null,
                     InvertAxis = null,
                     ConvertAxis = null,
-                    TargetButtonId = 7,
+                    TargetButtonId = vXbox.IWrapper.xinput_GAMEPAD_BACK,
                     Type = GamepadItemType.Button
                 },
                 new GamepadConfigurationItem
                 {
-                    TargetUsage = _vBox.hid_X,
+                    TargetUsage = vXbox.IWrapper.hid_X,
                     InvertAxis = false,
                     ConvertAxis = true,
                     TargetButtonId = null,
@@ -134,15 +134,7 @@ namespace MFIGamepadConfigCreator
                 },
                 new GamepadConfigurationItem
                 {
-                    TargetUsage = _vBox.hid_Y,
-                    InvertAxis = true,
-                    ConvertAxis = true,
-                    TargetButtonId = null,
-                    Type = GamepadItemType.Axis
-                },
-                new GamepadConfigurationItem
-                {
-                    TargetUsage = _vBox.hid_RX,
+                    TargetUsage = vXbox.IWrapper.hid_Y,
                     InvertAxis = false,
                     ConvertAxis = true,
                     TargetButtonId = null,
@@ -150,8 +142,16 @@ namespace MFIGamepadConfigCreator
                 },
                 new GamepadConfigurationItem
                 {
-                    TargetUsage = _vBox.hid_RY,
-                    InvertAxis = true,
+                    TargetUsage = vXbox.IWrapper.hid_RX,
+                    InvertAxis = false,
+                    ConvertAxis = true,
+                    TargetButtonId = null,
+                    Type = GamepadItemType.Axis
+                },
+                new GamepadConfigurationItem
+                {
+                    TargetUsage = vXbox.IWrapper.hid_RY,
+                    InvertAxis = false,
                     ConvertAxis = true,
                     TargetButtonId = null,
                     Type = GamepadItemType.Axis

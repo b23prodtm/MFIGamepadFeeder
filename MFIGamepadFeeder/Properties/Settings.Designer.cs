@@ -25,7 +25,8 @@ namespace MFIGamepadFeeder.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("(Vendor ID: 65535, Product ID: 0, Product version: 0, Serial Number: 289a4b181e8f" +
+            ")")]
         public string SelectedHidDevice {
             get {
                 return ((string)(this["SelectedHidDevice"]));
@@ -49,7 +50,7 @@ namespace MFIGamepadFeeder.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Configs/Nimbus.mficonfiguration")]
         public string SelectedConfigFile {
             get {
                 return ((string)(this["SelectedConfigFile"]));

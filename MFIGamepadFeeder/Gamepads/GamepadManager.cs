@@ -56,7 +56,6 @@ namespace MFIGamepadFeeder.Gamepads
         public HidDeviceRepresentation SelectedDevice { get; set; }
 
         public event ErorOccuredEventHandler ErrorOccuredEvent;
-
         public void Refresh()
         {
             // Kill exisiting gamepad Thread
@@ -74,7 +73,6 @@ namespace MFIGamepadFeeder.Gamepads
                     Log("Configuration incomplete");
                     return;
                 }
-                ;
 
                 GamepadConfiguration configuration = null;
                 HidDeviceRepresentation hidDeviceRepresentation = null;
@@ -84,16 +82,14 @@ namespace MFIGamepadFeeder.Gamepads
                     configuration = await GetConfigFromFilePath(selectedConfigFile);
                     hidDeviceRepresentation =
                         JsonConvert.DeserializeObject<HidDeviceRepresentation>(selectedHidDevice);
+                Log($"Using {hidDeviceRepresentation}, vJoy {vJoyId}, configuration file: {selectedConfigFile}");
+                // Setup device communication
+                SetupGamepad(hidDeviceRepresentation, vJoyId, configuration);
                 }
                 catch (Exception ex)
                 {
                     Log($"Error while reading configuration: {ex.Message}");
-                    return;
                 }
-
-                Log($"Using {hidDeviceRepresentation}, vJoy {vJoyId}, configuration file: {selectedConfigFile}");
-                // Setup device communication
-                SetupGamepad(hidDeviceRepresentation, vJoyId, configuration);
             });
             _currentGamepadThread.Start();
         }
