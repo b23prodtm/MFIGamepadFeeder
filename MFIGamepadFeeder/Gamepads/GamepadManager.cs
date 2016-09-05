@@ -147,7 +147,7 @@ namespace MFIGamepadFeeder.Gamepads
                     return;
                 }
 
-                gamepad = new Gamepad(config, gamePadId);
+                gamepad = new Gamepad(config, gamePadId, Settings.Default.CheckedLTRT);
                 gamepad.ErrorOccuredEvent += Gamepad_ErrorOccuredEvent;
 
                 Log($"Id: {gamePadId} Successfully initialized gamepad.");

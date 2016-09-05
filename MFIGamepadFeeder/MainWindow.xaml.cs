@@ -164,5 +164,12 @@ namespace MFIGamepadFeeder
                 NotifyIcon.Visibility = Visibility.Collapsed;
             }
         }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.CheckedLTRT = AddLTRTCheckBox.IsChecked??false;
+            Settings.Default.Save();
+            CurrentGamepadManager.Refresh();
+        }
     }
 }

@@ -16,12 +16,13 @@ namespace MFIGamepadFeeder
         private readonly uint _gamepadId;
         /**vJoyInterface wrapper*/
         private readonly IWrapper _vBox;
-
+        private bool AddRTLT;
         /**
          * Gamepad IWrapper is created if the VBus exists on the host.
          * **/
-        public Gamepad(GamepadConfiguration config, uint gamepadId)
+        public Gamepad(GamepadConfiguration config, uint gamepadId, bool AddRTLT)
         {
+            this.AddRTLT = AddRTLT;
             _config = config;
             _vBox = new IWrapper();
             _gamepadId = gamepadId;
@@ -174,16 +175,20 @@ namespace MFIGamepadFeeder
                     *AxisSL0 = (byte)value;
                     /** The MFi controller doesn't provide a left Thumb button 
                      * and the slider/trigger wasn't always detected as one,
-                     * so we can simulate and add a btn press (as the Left Thumb)*
-                    _vBox.SetBtnLT(_gamepadId, ConvertToButtonState(bvalue));*/
+                     * so we can simulate and add a btn press (as the Left Thumb)
+                     */
+                    if(AddRTLT)
+                        _vBox.SetBtnLT(_gamepadId, ConvertToButtonState((byte)value));
                 }
                 else if (targetAxis == hid_SL1)
                 {
                     *AxisSL1 = (byte)value;
                     /** The MFi controller doesn't provide a rightThumb button 
                      * and the slider/trigger wasn't always detected as one,
-                     * so we can simulate and add a btn press (as the Right Thumb)*
-                    _vBox.SetBtnRT(_gamepadId, ConvertToButtonState(bvalue));*/
+                     * so we can simulate and add a btn press (as the Right Thumb)
+                     */
+                    if (AddRTLT)
+                        _vBox.SetBtnRT(_gamepadId, ConvertToButtonState((byte)value));
                 }
             }
         }

@@ -25,6 +25,7 @@ namespace MFIGamepadFeeder.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string SelectedHidDevice {
             get {
                 return ((string)(this["SelectedHidDevice"]));
@@ -36,6 +37,7 @@ namespace MFIGamepadFeeder.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public uint SelectedJoyId {
             get {
                 return ((uint)(this["SelectedJoyId"]));
@@ -47,6 +49,7 @@ namespace MFIGamepadFeeder.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Configs/Nimbus.mficonfiguration")]
         public string SelectedConfigFile {
             get {
                 return ((string)(this["SelectedConfigFile"]));
@@ -89,6 +92,18 @@ namespace MFIGamepadFeeder.Properties {
             }
             set {
                 this["SelectedConfigFile2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CheckedLTRT {
+            get {
+                return ((bool)(this["CheckedLTRT"]));
+            }
+            set {
+                this["CheckedLTRT"] = value;
             }
         }
     }

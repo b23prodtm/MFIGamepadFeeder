@@ -20,5 +20,8 @@
     <Setting Name="SelectedConfigFile2" Type="System.String" Scope="User">
       <Value Profile="(Default)">Configs/Nimbus.mficonfiguration</Value>
     </Setting>
+    <Setting Name="CheckedLTRT" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

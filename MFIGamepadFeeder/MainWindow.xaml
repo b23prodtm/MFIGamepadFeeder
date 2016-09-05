@@ -19,12 +19,12 @@
             <StackPanel Orientation="Horizontal" Height="50">
                 <StackPanel Margin="10,0,0,0">
                     <Label x:Name="HidDeviceLabel" Content="Gamepads" HorizontalAlignment="Center" />
-                    <ComboBox x:Name="HidDeviceCombobox" Width="491" SelectionChanged="HidDeviceCombobox_SelectionChanged" />
+                    <ComboBox x:Name="HidDeviceCombobox" Width="491" SelectionChanged="HidDeviceCombobox_SelectionChanged" ToolTip="Select the gamepad device (no name)" />
                 </StackPanel>
                 <StackPanel Margin="10,0">
                     <Label x:Name="DeviceIdLabel" Content="vJoy IDs" HorizontalAlignment="Center" />
                     <TextBox x:Name="DeviceIdTextBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap"
-                             Width="59" TextChanged="DeviceIdTextBox_TextChanged" />
+                             Width="59" TextChanged="DeviceIdTextBox_TextChanged" ToolTip="Choose an available vJoy ID (1-4)" />
                 </StackPanel>
                 <StackPanel Margin="0,0,10,0">
                     <Label x:Name="ConfigFileLabel" Content="Select configuration files..." HorizontalAlignment="Center" />
@@ -35,11 +35,11 @@
             <!--/** 2nd Gamepad*/-->
             <StackPanel Orientation="Horizontal" Height="50">
                 <StackPanel Margin="10,5,0,0">
-                    <ComboBox x:Name="HidDeviceCombobox2" Width="490" SelectionChanged="HidDeviceCombobox2_SelectionChanged" />
+                    <ComboBox x:Name="HidDeviceCombobox2" Width="490" SelectionChanged="HidDeviceCombobox2_SelectionChanged" ToolTip="Select the gamepad device (no name)" />
                 </StackPanel>
                 <StackPanel Margin="10,5,0,0">
                     <TextBox x:Name="DeviceIdTextBox2" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap"
-                             Width="59" TextChanged="DeviceIdTextBox2_TextChanged" />
+                             Width="59" TextChanged="DeviceIdTextBox2_TextChanged" ToolTip="Choose an available vJoy ID (1-4)" />
                 </StackPanel>
                 <StackPanel Margin="10,5,0,0">
                     <ComboBox x:Name="ConfigFileCombobox2" Width="207" SelectionChanged="ConfigFileCombobox2_SelectionChanged" />
@@ -51,7 +51,10 @@
                          ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True" 
                          HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" IsReadOnly="True" Width="559" Height="136"
                         />
-                <Button x:Name="RefreshBtn" Content="Enable/Disable" Click="Button_Click" VerticalAlignment="Top" Width="207" HorizontalAlignment="Right" Margin="10,0,0,0" Height="20" />
+                <StackPanel Orientation="Vertical">
+                <CheckBox x:Name="AddLTRTCheckBox" Margin="10,10,10,10" Content="Add LThumb and RThumb" Checked="CheckBox_Checked" ToolTip="Simulate the L2/R2 Buttons"/>
+                <Button x:Name="RefreshBtn" Content="Plug/Unplug Devices" Click="Button_Click" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,0,0,0" Height="20" Width="207" ToolTip="Click to enable the devices" />
+                </StackPanel>
             </StackPanel>
         </StackPanel>
 
