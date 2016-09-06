@@ -33,6 +33,8 @@ namespace MFIGamepadFeeder
          .Where(s => s.EndsWith(".mficonfiguration"));
             ConfigFileCombobox.ItemsSource = configFiles;
             ConfigFileCombobox.SelectedItem = Settings.Default.SelectedConfigFile.ToString();
+
+            AddLTRTCheckBox.IsChecked = Settings.Default.CheckedLTRT;
         }
 
         private void LoadSettings()
@@ -165,11 +167,11 @@ namespace MFIGamepadFeeder
             }
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private void CheckBox_Checked_Change(object sender, RoutedEventArgs e)
         {
             Settings.Default.CheckedLTRT = AddLTRTCheckBox.IsChecked??false;
             Settings.Default.Save();
-            CurrentGamepadManager.Refresh();
         }
+
     }
 }

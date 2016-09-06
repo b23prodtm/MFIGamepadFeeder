@@ -52,8 +52,8 @@
                          HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" IsReadOnly="True" Width="559" Height="136"
                         />
                 <StackPanel Orientation="Vertical">
-                <CheckBox x:Name="AddLTRTCheckBox" Margin="10,10,10,10" Content="Add LThumb and RThumb" Checked="CheckBox_Checked" ToolTip="Simulate the L2/R2 Buttons"/>
-                <Button x:Name="RefreshBtn" Content="Plug/Unplug Devices" Click="Button_Click" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,0,0,0" Height="20" Width="207" ToolTip="Click to enable the devices" />
+                    <CheckBox x:Name="AddLTRTCheckBox" Margin="10,10,10,10" Content="Set L1/R2 as LThumb/RThumb" Checked="CheckBox_Checked_Change" Unchecked="CheckBox_Checked_Change" ToolTip="Simulate the L2/R2 Buttons"/>
+                    <Button x:Name="RefreshBtn" Content="Plug/Unplug Devices" Click="Button_Click" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,0,0,0" Height="20" Width="207" ToolTip="Click to enable the devices" />
                 </StackPanel>
             </StackPanel>
         </StackPanel>

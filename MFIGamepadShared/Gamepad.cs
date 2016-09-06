@@ -116,15 +116,17 @@ namespace MFIGamepadFeeder
                 GetDpad(state, i, &dPad);
             }
             /** Send data from Axes and Triggers to vJoy*/
-            _vBox.SetAxisXY(_gamepadId, AxisX, AxisY, hid_X, hid_Y, xinput_LAXIS_DEADZONE);
-            _vBox.SetAxisXY(_gamepadId, AxisRX, AxisRY, hid_RX, hid_RY, xinput_RAXIS_DEADZONE);
-            _vBox.SetTriggerL(_gamepadId, AxisSL0, xinput_TRIGGER_THRESHOLD);
-            _vBox.SetTriggerR(_gamepadId, AxisSL1, xinput_TRIGGER_THRESHOLD);
+            int maxAxisValue = 0;
+            _vBox.GetVJDAxisMax(_gamepadId, hid_X, &maxAxisValue);
+            _vBox.SetAxisXY(_gamepadId, AxisX, AxisY, hid_X, hid_Y, xinput_LAXIS_DEADZONE, (short)maxAxisValue);
+            _vBox.GetVJDAxisMax(_gamepadId, hid_X, &maxAxisValue);
+            _vBox.SetAxisXY(_gamepadId, AxisRX, AxisRY, hid_RX, hid_RY, xinput_RAXIS_DEADZONE, (short)maxAxisValue);
+            _vBox.SetTriggerLR(_gamepadId, AxisSL0, AxisSL1, xinput_TRIGGER_THRESHOLD);
             _vBox.SetDpad(_gamepadId, dPad);
-            //// debug
-            //_vBox.GetAxisXY(_gamepadId, &AxisX, &AxisY, hid_X, hid_Y);
-            //_vBox.GetAxisXY(_gamepadId, &AxisRX, &AxisRY, hid_RX, hid_RY);
-            //_vBox.GetAxisXY(_gamepadId, &AxisSL0, &AxisSL1, hid_SL0, hid_SL1);
+            //// debug read values
+            _vBox.GetAxisXY(_gamepadId, &AxisX, &AxisY, hid_X, hid_Y);
+            _vBox.GetAxisXY(_gamepadId, &AxisRX, &AxisRY, hid_RX, hid_RY);
+            _vBox.GetTriggerLR(_gamepadId, &AxisSL0, &AxisSL1);
         }
 
         /**
@@ -177,7 +179,7 @@ namespace MFIGamepadFeeder
                      * and the slider/trigger wasn't always detected as one,
                      * so we can simulate and add a btn press (as the Left Thumb)
                      */
-                    if(AddRTLT)
+                    if (AddRTLT)
                         _vBox.SetBtnLT(_gamepadId, ConvertToButtonState((byte)value));
                 }
                 else if (targetAxis == hid_SL1)
@@ -198,7 +200,19 @@ namespace MFIGamepadFeeder
             GamepadConfigurationItem config = _config.ConfigItems[index];
             if (config.Type == GamepadItemType.Button)
             {
-                _vBox.SetBtnAny(_gamepadId, ConvertToButtonState((byte)value), config.TargetButtonId ?? 0);
+                /** Simulate a back button.
+                 * button start is the back button if LShoulder+START are pressed simultaneously */
+                if (config.TargetButtonId == xinput_GAMEPAD_START)
+                {
+                    byte AxisSL0 = 0, AxisSL1 = 0;
+                    _vBox.GetTriggerLR(_gamepadId, &AxisSL0, &AxisSL1);
+                    if (AxisSL0 > 0)
+                        _vBox.SetBtnBack(_gamepadId, ConvertToButtonState((byte)value));
+                    else
+                        _vBox.SetBtnStart(_gamepadId, ConvertToButtonState((byte)value));
+                }
+                else
+                    _vBox.SetBtnAny(_gamepadId, ConvertToButtonState((byte)value), config.TargetButtonId ?? 0);
             }
         }
         /** dPad flags*/
