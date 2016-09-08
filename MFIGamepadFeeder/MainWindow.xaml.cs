@@ -35,6 +35,7 @@ namespace MFIGamepadFeeder
             ConfigFileCombobox.SelectedItem = Settings.Default.SelectedConfigFile.ToString();
 
             AddLTRTCheckBox.IsChecked = Settings.Default.CheckedLTRT;
+            AddBackCheckBox.IsChecked = Settings.Default.CheckedBack;
         }
 
         private void LoadSettings()
@@ -169,7 +170,8 @@ namespace MFIGamepadFeeder
 
         private void CheckBox_Checked_Change(object sender, RoutedEventArgs e)
         {
-            Settings.Default.CheckedLTRT = AddLTRTCheckBox.IsChecked??false;
+            Settings.Default.CheckedLTRT = AddLTRTCheckBox.IsChecked ?? false;
+            Settings.Default.CheckedBack = AddBackCheckBox.IsChecked ?? false;
             Settings.Default.Save();
         }
 

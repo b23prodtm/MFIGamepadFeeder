@@ -16,13 +16,12 @@ namespace MFIGamepadFeeder
         private readonly uint _gamepadId;
         /**vJoyInterface wrapper*/
         private readonly IWrapper _vBox;
-        private bool AddRTLT;
+        public bool AddRTLT = false, AddBack = false;
         /**
          * Gamepad IWrapper is created if the VBus exists on the host.
          * **/
-        public Gamepad(GamepadConfiguration config, uint gamepadId, bool AddRTLT)
+        public Gamepad(GamepadConfiguration config, uint gamepadId)
         {
-            this.AddRTLT = AddRTLT;
             _config = config;
             _vBox = new IWrapper();
             _gamepadId = gamepadId;
@@ -105,17 +104,21 @@ namespace MFIGamepadFeeder
         public unsafe void UpdateState(byte[] state)
         {
             //            Log(string.Join(" ", state));
-            uint dPad = 0;
+            uint dPad = 0, btns = 0, btnsOff = 0;
             short AxisX = 0, AxisY = 0, AxisRX = 0, AxisRY = 0;
             byte AxisSL0 = 0x00, AxisSL1 = 0x00;
             for (var i = 0; i < _config.ConfigItems.Count; i++)
             {
                 GetAxis(state, i, &AxisX, &AxisY, &AxisRX, &AxisRY, &AxisSL0, &AxisSL1);
                 /** sent directly to vJoy*/
-                SetGamepadItem(state, i);
+                GetGamepadItem(state, i, &btns, &btnsOff);
                 GetDpad(state, i, &dPad);
             }
-            /** Send data from Axes and Triggers to vJoy*/
+
+            /** Send data from Btns, Axes and Triggers to vJoy*/
+            addBtnHacks(AxisSL0, AxisSL1, &btns, &btnsOff);
+            _vBox.SetBtnAny(_gamepadId, false, btnsOff);
+            _vBox.SetBtnAny(_gamepadId, true, btns);
             int maxAxisValue = 0;
             _vBox.GetVJDAxisMax(_gamepadId, hid_X, &maxAxisValue);
             _vBox.SetAxisXY(_gamepadId, AxisX, AxisY, hid_X, hid_Y, xinput_LAXIS_DEADZONE, (short)maxAxisValue);
@@ -123,12 +126,62 @@ namespace MFIGamepadFeeder
             _vBox.SetAxisXY(_gamepadId, AxisRX, AxisRY, hid_RX, hid_RY, xinput_RAXIS_DEADZONE, (short)maxAxisValue);
             _vBox.SetTriggerLR(_gamepadId, AxisSL0, AxisSL1, xinput_TRIGGER_THRESHOLD);
             _vBox.SetDpad(_gamepadId, dPad);
-            //// debug read values
+            // debug read values
+#if DEBUG
             _vBox.GetAxisXY(_gamepadId, &AxisX, &AxisY, hid_X, hid_Y);
             _vBox.GetAxisXY(_gamepadId, &AxisRX, &AxisRY, hid_RX, hid_RY);
             _vBox.GetTriggerLR(_gamepadId, &AxisSL0, &AxisSL1);
+#endif
         }
-
+        /** BACK, LT/RT hacks. */
+        private unsafe void addBtnHacks(byte AxisSL0, byte AxisSL1, uint* btns, uint* btnsOff)
+        {
+            if (0 != (*btns & xinput_GAMEPAD_START) && (AddBack || AddRTLT))
+            {
+                /**
+                 * First Button START was pressed...
+                 * Don't compute with any Deadzone, 
+                 * that allows a "light" usage of the trigger and combine with the START btn
+                 */
+                if (AxisSL0 > 0 || AxisSL1 > 0)
+                {
+                    /** Simulate a back button.
+                     * button start is the back button if LTrigger+RTrigger+START are pressed simultaneously */
+                    if (AddBack)
+                    {
+                        if (AxisSL0 > 0 && AxisSL1 > 0)
+                        {
+                            *btns |= xinput_GAMEPAD_BACK;
+                        }
+                        else
+                            *btnsOff |= xinput_GAMEPAD_BACK;
+                    }
+                    /** The MFi Nimbus controller doesn't provide left and right Thumb buttons 
+                     * so we can simulate and add a btn press (LTrigger or RTrigger+START)
+                     */
+                    if (AddRTLT)
+                    {
+                        if (AxisSL0 > 0)
+                        {
+                            *btns |= xinput_GAMEPAD_LEFT_THUMB;
+                            *btnsOff |= xinput_GAMEPAD_RIGHT_THUMB;
+                        }
+                        else if (AxisSL1 > 0)
+                        {
+                            *btns |= xinput_GAMEPAD_RIGHT_THUMB;
+                            *btnsOff |= xinput_GAMEPAD_LEFT_THUMB;
+                        }
+                        else
+                        {
+                            *btnsOff |= xinput_GAMEPAD_LEFT_THUMB | xinput_GAMEPAD_RIGHT_THUMB;
+                        }
+                    }
+                    /**...and disable START btn */
+                    *btns &= ~xinput_GAMEPAD_START;
+                    *btnsOff |= xinput_GAMEPAD_START;
+                }
+            }
+        }
         /**
          A normalized axis value is sent to vJoy Driver.
             */
@@ -175,44 +228,23 @@ namespace MFIGamepadFeeder
                 else if (targetAxis == hid_SL0)
                 {
                     *AxisSL0 = (byte)value;
-                    /** The MFi controller doesn't provide a left Thumb button 
-                     * and the slider/trigger wasn't always detected as one,
-                     * so we can simulate and add a btn press (as the Left Thumb)
-                     */
-                    if (AddRTLT)
-                        _vBox.SetBtnLT(_gamepadId, ConvertToButtonState((byte)value));
                 }
                 else if (targetAxis == hid_SL1)
                 {
                     *AxisSL1 = (byte)value;
-                    /** The MFi controller doesn't provide a rightThumb button 
-                     * and the slider/trigger wasn't always detected as one,
-                     * so we can simulate and add a btn press (as the Right Thumb)
-                     */
-                    if (AddRTLT)
-                        _vBox.SetBtnRT(_gamepadId, ConvertToButtonState((byte)value));
                 }
             }
         }
-        private unsafe void SetGamepadItem(byte[] values, int index)
+        private unsafe void GetGamepadItem(byte[] values, int index, uint* btns, uint* btnsOff)
         {
             double value = values[index];
             GamepadConfigurationItem config = _config.ConfigItems[index];
             if (config.Type == GamepadItemType.Button)
             {
-                /** Simulate a back button.
-                 * button start is the back button if LShoulder+START are pressed simultaneously */
-                if (config.TargetButtonId == xinput_GAMEPAD_START)
-                {
-                    byte AxisSL0 = 0, AxisSL1 = 0;
-                    _vBox.GetTriggerLR(_gamepadId, &AxisSL0, &AxisSL1);
-                    if (AxisSL0 > 0)
-                        _vBox.SetBtnBack(_gamepadId, ConvertToButtonState((byte)value));
-                    else
-                        _vBox.SetBtnStart(_gamepadId, ConvertToButtonState((byte)value));
-                }
+                if (ConvertToButtonState((byte)value))
+                    *btns |= config.TargetButtonId ?? 0;
                 else
-                    _vBox.SetBtnAny(_gamepadId, ConvertToButtonState((byte)value), config.TargetButtonId ?? 0);
+                    *btnsOff |= config.TargetButtonId ?? 0;
             }
         }
         /** dPad flags*/

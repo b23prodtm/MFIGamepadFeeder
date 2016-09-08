@@ -106,5 +106,17 @@ namespace MFIGamepadFeeder.Properties {
                 this["CheckedLTRT"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CheckedBack {
+            get {
+                return ((bool)(this["CheckedBack"]));
+            }
+            set {
+                this["CheckedBack"] = value;
+            }
+        }
     }
 }
