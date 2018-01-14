@@ -69,13 +69,13 @@ namespace MFIGamepadConfigCreator
                 },
                 new GamepadMappingItem
                 {
-                    Type = GamepadMappingItemType.Axis,
-                    AxisType = AxisType.LTrigger
+                    Type = GamepadMappingItemType.Button,
+                    ButtonType = XInputGamepadButtons.LTrigger
                 },
                 new GamepadMappingItem
                 {
-                    Type = GamepadMappingItemType.Axis,
-                    AxisType = AxisType.RTrigger
+                    Type = GamepadMappingItemType.Button,
+                    ButtonType = XInputGamepadButtons.RTrigger
                 },
                 new GamepadMappingItem
                 {
@@ -112,12 +112,12 @@ namespace MFIGamepadConfigCreator
                 },
                 new GamepadMappingItem
                 {
-                    Type = GamepadMappingItemType.Button,
+                    Type = GamepadMappingItemType.Axis,
                     AxisType = AxisType.LTrigger
                 },
                 new GamepadMappingItem
                 {
-                    Type = GamepadMappingItemType.Button,
+                    Type = GamepadMappingItemType.Axis,
                     AxisType = AxisType.RTrigger
                 }
             }, new List<VirtualKeyMappingItem>()
