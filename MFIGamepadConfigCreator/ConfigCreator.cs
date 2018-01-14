@@ -6,6 +6,9 @@ namespace MFIGamepadConfigCreator
 {
     internal class ConfigCreator
     {
+        /* Creates a configuration as to the device specific 
+         * stream bytes configuration (XInputGamepadButtons)
+         */
         public GamepadMapping GetNimbusConfiguration()
         {
             return new GamepadMapping(new List<GamepadMappingItem>
@@ -106,6 +109,16 @@ namespace MFIGamepadConfigCreator
                     AxisType = AxisType.Ry,
                     InvertAxis = false,
                     ConvertAxis = true
+                },
+                new GamepadMappingItem
+                {
+                    Type = GamepadMappingItemType.Button,
+                    AxisType = AxisType.LTrigger
+                },
+                new GamepadMappingItem
+                {
+                    Type = GamepadMappingItemType.Button,
+                    AxisType = AxisType.RTrigger
                 }
             }, new List<VirtualKeyMappingItem>()
             {
@@ -113,26 +126,26 @@ namespace MFIGamepadConfigCreator
                 {
                     SourceKeys = new List<XInputGamepadButtons?>()
                     {
-                        XInputGamepadButtons.RBumper,
-                        XInputGamepadButtons.LBumper,
+                        XInputGamepadButtons.RTrigger,
+                        XInputGamepadButtons.LTrigger,
                         XInputGamepadButtons.Start
                     },
                     DestinationItem = XInputGamepadButtons.Back
                 },
-                           new VirtualKeyMappingItem()
+                new VirtualKeyMappingItem()
                 {
                     SourceKeys = new List<XInputGamepadButtons?>()
                     {
-                        XInputGamepadButtons.LBumper,
+                        XInputGamepadButtons.LTrigger,
                         XInputGamepadButtons.Start
                     },
                     DestinationItem = XInputGamepadButtons.LeftStick
                 },
-                                      new VirtualKeyMappingItem()
+                new VirtualKeyMappingItem()
                 {
                     SourceKeys = new List<XInputGamepadButtons?>()
                     {
-                        XInputGamepadButtons.RBumper,
+                        XInputGamepadButtons.RTrigger,
                         XInputGamepadButtons.Start
                     },
                     DestinationItem = XInputGamepadButtons.RightStick
