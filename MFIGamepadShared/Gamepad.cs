@@ -141,7 +141,7 @@ namespace MFIGamepadFeeder
 
                         if (count > 0)
                         {
-                            UpdateState(bytes, 0, 0, 0);
+                            UpdateState(bytes, 0, 0, 0, 0);
                         }
                     }
                 }
@@ -207,18 +207,18 @@ namespace MFIGamepadFeeder
             return true;
         }
 
-        public void UpdateState(byte[] state, XInputGamepadButtons buttonsState, XInputGamepadButtons dPadState, int i)
+        public void UpdateState(byte[] state, XInputGamepadButtons buttonsState, XInputGamepadButtons dPadState, XInputGamepadButtons triggerState, int i)
         {
             // UpdateState recurses state.count + 1 times (17)
             if (i < _config.Mapping.MappingItems.Count && i < state.Count())
             {
                 var configForCurrentItem = _config.Mapping.MappingItems[i];
                 var itemValue = state[i];
-
+                
                 if (configForCurrentItem.Type == GamepadMappingItemType.Axis)
                 {
                     if (ConvertToButtonState(itemValue))
-                        dPadState |= (XInputGamepadButtons)((int)XInputGamepadButtons.All & ((int)configForCurrentItem.AxisType.Value << 8));
+                        triggerState |= (XInputGamepadButtons)((int)XInputGamepadButtons.All & ((int)configForCurrentItem.AxisType.Value << 8));
                     UpdateAxis(itemValue, configForCurrentItem);
                 }
                 else if ((configForCurrentItem.Type == GamepadMappingItemType.DPad) && ConvertToButtonState(itemValue) &&
@@ -231,13 +231,13 @@ namespace MFIGamepadFeeder
                 {
                     buttonsState |= configForCurrentItem.ButtonType.Value;
                 }
-                UpdateState(state, buttonsState, dPadState, i + 1);
+                UpdateState(state, buttonsState, dPadState, triggerState, i + 1);
                 return;
             }
             
             foreach (var virtualMapping in _virtualMappings)
             {
-                if ((virtualMapping.Key & (buttonsState | dPadState)) == virtualMapping.Key)
+                if ((virtualMapping.Key & (buttonsState | dPadState | triggerState)) == virtualMapping.Key)
                 {
                     buttonsState |= virtualMapping.Value;
                     buttonsState ^= virtualMapping.Key;
@@ -312,7 +312,7 @@ namespace MFIGamepadFeeder
 
         private static double InvertNormalizedAxis(double axisToInvert)
         {
-            return 1.0 - axisToInvert;
+            return -axisToInvert;
         }
 
         private static bool ConvertToButtonState(byte value)
