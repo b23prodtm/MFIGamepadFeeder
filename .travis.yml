@@ -1,6 +1,9 @@
 language: csharp
 solution: MFIGamepadFeeder.sln
+mono: none
+dotnet: 2.1.2
 script:
+  - dotnet restore
   - export SLN_CFG="Release (Remote)"
   - msbuild MFIGamepadFeeder.sln /maxcpucount:4 /p:Platform=x64;Configuration=${SLN_CFG}
   - export GIT_HASH=$(git rev-parse --short HEAD)

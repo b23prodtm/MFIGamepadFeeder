@@ -130,22 +130,30 @@
   "VirtualKeysItems": [
     {
       "SourceKeys": [
-        2048,
-        1024,
+        512,
+        256,
+        16
+      ],
+      "DestinationItem": 1024
+    },
+    {
+      "SourceKeys": [
+        65536,
+        131072,
         16
       ],
       "DestinationItem": 32
     },
     {
       "SourceKeys": [
-        1024,
+        65536,
         16
       ],
       "DestinationItem": 64
     },
     {
       "SourceKeys": [
-        2048,
+        131072,
         16
       ],
       "DestinationItem": 128
