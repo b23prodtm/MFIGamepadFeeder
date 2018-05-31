@@ -1,0 +1,26 @@
+language: csharp
+solution: MFIGamepadFeeder.sln
+mono: none
+dotnet: 2.1.2
+script:
+  - dotnet restore
+  - export SLN_CFG="Release (Remote)"
+  - msbuild MFIGamepadFeeder.sln /maxcpucount:4 /p:Platform=x64;Configuration=${SLN_CFG}
+  - export GIT_HASH=$(git rev-parse --short HEAD)
+  - zip -p "./MFIGamepadFeeder-${SLN_CFG}-${GIT_HASH}.zip" "./MFIGamepadFeeder/bin/x64/${SLN_CFG}/*"
+
+before_deploy:
+  # Set up git user name and tag this commit
+  - git config --local user.name ${GIT_USER}
+  - git config --local user.email ${GIT_MAIL}
+
+# How to obtain a api_key is described in Travis' documentation page "GitHub Releases Uploading"
+deploy:
+  provider: releases
+  api_key: ${TRAVIS_KEY}
+  file:
+    - "./MFIGamepadFeeder-${SLN_CFG}-${GIT_HASH}.zip"
+  on:
+    repo: b23prodtm/MFIGamepadFeeder
+    tags: false
+  skip_cleanup: true
