@@ -5,7 +5,7 @@ dotnet: 2.1.2
 script:
   - dotnet restore
   - export SLN_CFG="Release (Remote)"
-  - msbuild MFIGamepadFeeder.sln /maxcpucount:4 /p:Platform=x64;Configuration=${SLN_CFG}
+  - xbuild MFIGamepadFeeder.sln /maxcpucount:4 /p:Platform=x64;Configuration=${SLN_CFG}
   - export GIT_HASH=$(git rev-parse --short HEAD)
   - zip -p "./MFIGamepadFeeder-${SLN_CFG}-${GIT_HASH}.zip" "./MFIGamepadFeeder/bin/x64/${SLN_CFG}/*"
 
