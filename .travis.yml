@@ -2,7 +2,7 @@ language: csharp
 solution: MFIGamepadFeeder.sln
 script:
   - export SLN_CFG="Release (Remote)"
-  - xbuild MFIGamepadFeeder.sln /maxcpucount:4 /p:Platform=x64;Configuration=${SLN_CFG}
+  - msbuild MFIGamepadFeeder.sln /maxcpucount:4 /p:Platform=x64;Configuration=${SLN_CFG}
   - export GIT_HASH=$(git rev-parse --short HEAD)
   - zip -p "./MFIGamepadFeeder-${SLN_CFG}-${GIT_HASH}.zip" "./MFIGamepadFeeder/bin/x64/${SLN_CFG}/*"
 
