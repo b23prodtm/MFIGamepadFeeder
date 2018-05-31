@@ -25,7 +25,7 @@ namespace vGenWrapper
         All = Start | Back | LeftStick | RightStick | LBumper | RBumper | A | B | X | Y | DpadUp | DpadDown | DpadLeft| DpadRight | LTrigger | RTrigger | Guide
     }
 
-    public enum AxisType : byte
+    public enum AxisType : uint
     {
         Rx = 8,
         Ry = 9,
